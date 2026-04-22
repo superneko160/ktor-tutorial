@@ -34,4 +34,31 @@ class ServerTest {
         assertEquals("html", client.get("/content").contentType()?.contentSubtype)
         assertContains(client.get("/content").bodyAsText(), "This page is built with:")
     }
+
+    @Test
+    fun `tasks can be found by priority` () = testApplication {
+        configure()
+
+        val response = client.get("/tasks/byPriority/Medium")
+        val body = response.bodyAsText()
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertContains(body, "草刈り、除草剤を撒く")
+        assertContains(body, "Kotlinの学習")
+    }
+
+    @Test
+    fun `invalid priority produces 400` () = testApplication {
+        configure()
+
+        val response = client.get("/tasks/byPriority/Invalid")
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `unused priority produces 404` () = testApplication {
+        configure()
+
+        val response = client.get("/tasks/byPriority/Vital")
+        assertEquals(HttpStatusCode.NotFound, response.status)
+    }
 }
