@@ -1,0 +1,6 @@
+ktor:
+  deployment:
+    port: 9292
+  application:
+    modules:
+      - com.example.RoutingKt.configureRouting
