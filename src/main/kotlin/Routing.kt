@@ -53,6 +53,7 @@ fun Application.configureRouting() {
                         text = tasks.tasksAsTable()
                     )
                 } catch (e: IllegalArgumentException) {
+                    e.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest)
                 }
             }
@@ -82,8 +83,10 @@ fun Application.configureRouting() {
                     )
                     call.respond(HttpStatusCode.NoContent)
                 } catch (e: IllegalArgumentException) {
+                    e.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest)
                 } catch (e: IllegalStateException) {
+                    e.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest)
                 }
             }
