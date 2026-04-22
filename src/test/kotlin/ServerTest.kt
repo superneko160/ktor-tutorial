@@ -1,9 +1,12 @@
 package com.example
 
-import io.ktor.client.request.get
+import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.formUrlEncode
 import io.ktor.server.testing.testApplication
 import kotlin.test.*
 
@@ -60,5 +63,30 @@ class ServerTest {
 
         val response = client.get("/tasks/byPriority/Vital")
         assertEquals(HttpStatusCode.NotFound, response.status)
+    }
+
+    @Test
+    fun `new tasks can be added` () = testApplication {
+        configure()
+
+        val postResponse = client.post("/tasks") {
+            header(
+                HttpHeaders.ContentType,
+                ContentType.Application.FormUrlEncoded.toString()
+            )
+            setBody(
+                listOf(
+                    "name" to "水泳",
+                    "description" to "水泳教室へ行く",
+                    "priority" to "Low",
+                ).formUrlEncode()
+            )
+        }
+        assertEquals(HttpStatusCode.NoContent, postResponse.status)
+
+        val getResponse = client.get("/tasks")
+        assertEquals(HttpStatusCode.OK, getResponse.status)
+        val body = getResponse.bodyAsText()
+        assertContains(body, "水泳教室へ行く")
     }
 }

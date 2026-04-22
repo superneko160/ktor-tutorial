@@ -7,9 +7,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import com.example.model.*
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.request.receiveParameters
 
 fun Application.configureRouting() {
     routing {
+        staticResources("/content", "content")
+
         get("/") {
             call.respondText("Hello, Ktor!")
         }
@@ -19,8 +22,6 @@ fun Application.configureRouting() {
             val type = ContentType.parse("text/html")
             call.respondText(text, contentType = type)
         }
-
-        staticResources("/content", "content")
 
         get("/tasks") {
             val tasks = TaskRepository.allTasks()
@@ -51,6 +52,37 @@ fun Application.configureRouting() {
                     text = tasks.tasksAsTable()
                 )
             } catch (e: IllegalArgumentException) {
+                call.respond(HttpStatusCode.BadRequest)
+            }
+        }
+
+        post("/tasks") {
+            val formContent = call.receiveParameters()
+
+            val params = Triple(
+                formContent["name"] ?: "",
+                formContent["description"] ?: "",
+                formContent["priority"] ?: ""
+            )
+
+            if (params.toList().any { it.isEmpty() }) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@post
+            }
+
+            try {
+                val priority = Priority.valueOf(params.third)
+                TaskRepository.addTask(
+                    Task(
+                        params.first,
+                        params.second,
+                        priority
+                    )
+                )
+                call.respond(HttpStatusCode.NoContent)
+            } catch (e: IllegalArgumentException) {
+                call.respond(HttpStatusCode.BadRequest)
+            } catch (e: IllegalStateException) {
                 call.respond(HttpStatusCode.BadRequest)
             }
         }
