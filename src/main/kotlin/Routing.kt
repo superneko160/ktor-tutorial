@@ -1,13 +1,13 @@
 package com.example
 
+import com.example.model.*
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
 import io.ktor.server.http.content.staticResources
+import io.ktor.server.request.receiveParameters
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import com.example.model.*
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.request.receiveParameters
 
 fun Application.configureRouting() {
     routing {
@@ -28,7 +28,7 @@ fun Application.configureRouting() {
                 val tasks = TaskRepository.allTasks()
                 call.respondText(
                     contentType = ContentType.parse("text/html"),
-                    text = tasks.tasksAsTable()
+                    text = tasks.tasksAsTable(),
                 )
             }
 
@@ -50,7 +50,7 @@ fun Application.configureRouting() {
 
                     call.respondText(
                         contentType = ContentType.parse("text/html"),
-                        text = tasks.tasksAsTable()
+                        text = tasks.tasksAsTable(),
                     )
                 } catch (e: IllegalArgumentException) {
                     e.printStackTrace()
@@ -61,11 +61,12 @@ fun Application.configureRouting() {
             post {
                 val formContent = call.receiveParameters()
 
-                val params = Triple(
-                    formContent["name"] ?: "",
-                    formContent["description"] ?: "",
-                    formContent["priority"] ?: ""
-                )
+                val params =
+                    Triple(
+                        formContent["name"] ?: "",
+                        formContent["description"] ?: "",
+                        formContent["priority"] ?: "",
+                    )
 
                 if (params.toList().any { it.isEmpty() }) {
                     call.respond(HttpStatusCode.BadRequest)
@@ -78,8 +79,8 @@ fun Application.configureRouting() {
                         Task(
                             params.first,
                             params.second,
-                            priority
-                        )
+                            priority,
+                        ),
                     )
                     call.respond(HttpStatusCode.NoContent)
                 } catch (e: IllegalArgumentException) {
