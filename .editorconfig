@@ -1,0 +1,5 @@
+[*.{kt,kts}]
+# ワイルドカードインポートを許可する
+ktlint_standard_no-wildcard-imports = disabled
+# ファイル名の命名規則（PascalCase）を無視する
+ktlint_standard_filename = disabled
