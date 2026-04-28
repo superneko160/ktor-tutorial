@@ -7,8 +7,15 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.formUrlEncode
-import io.ktor.server.testing.testApplication
+import io.ktor.server.testing.*
 import kotlin.test.*
+
+fun ApplicationTestBuilder.configure() {
+    application {
+        configureSerialization()
+        configureRouting()
+    }
+}
 
 class ServerTest {
     @Test
@@ -95,5 +102,17 @@ class ServerTest {
             assertEquals(HttpStatusCode.OK, getResponse.status)
             val body = getResponse.bodyAsText()
             assertContains(body, "水泳教室へ行く")
+        }
+
+    @Test
+    fun `tasks can be returned as json`() =
+        testApplication {
+            configure()
+
+            val response = client.get("/tasks/json")
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals(ContentType.Application.Json.toString(), response.contentType()?.toString()?.split(";")?.get(0))
+            assertContains(response.bodyAsText(), "清掃")
+            assertContains(response.bodyAsText(), "Medium")
         }
 }

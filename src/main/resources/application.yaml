@@ -3,4 +3,5 @@ ktor:
     port: 9292
   application:
     modules:
+      - com.example.SerializationKt.configureSerialization
       - com.example.RoutingKt.configureRouting
