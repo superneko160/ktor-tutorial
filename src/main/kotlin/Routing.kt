@@ -32,6 +32,11 @@ fun Application.configureRouting() {
                 )
             }
 
+            get("/json") {
+                val tasks = TaskRepository.allTasks()
+                call.respond(tasks)
+            }
+
             get("/byPriority/{priority?}") {
                 val priorityAsText = call.parameters["priority"]
                 if (priorityAsText == null) {
